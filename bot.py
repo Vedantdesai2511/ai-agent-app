@@ -57,17 +57,26 @@ async def handle_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                                        text="Sorry, I couldn't extract all the required details. Please provide the person's name, their email, and the official's email.")
         return
 
-    email_draft = llm_service.generate_email_draft(parsed_data['name'], parsed_data['offender_email'])
+    # *** KEY CHANGE: Pass the gist to the email generator ***
+    # The .get('email_gist') will return None if the key doesn't exist, which is perfect.
+    email_gist = parsed_data.get('email_gist')
+
+    email_draft = llm_service.generate_email_draft(
+        name=parsed_data['name'],
+        offender_email=parsed_data['offender_email'],
+        gist=email_gist  # <-- Pass the extracted gist here
+    )
+
     report_id = database_service.create_report(
         chat_id, parsed_data['name'], parsed_data['offender_email'], parsed_data['official_email'], email_draft
     )
 
     context.chat_data['pending_approval_id'] = report_id
 
-    # *** KEY CHANGE: Updated user instructions ***
+    # ... (the rest of the function remains the same) ...
     response_message = (
         f"**New Report Draft (ID: {report_id})**\n\n"
-        "Here is the draft I've prepared. Please review it carefully.\n\n"
+        "Here is the draft I've prepared based on your details. Please review it carefully.\n\n"
         "-------------------------------------\n"
         f"{email_draft}\n"
         "-------------------------------------\n\n"
