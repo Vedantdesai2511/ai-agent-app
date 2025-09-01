@@ -1,0 +1,13 @@
+# Python virtual environment
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# TinyDB database file (we will manage this differently on the server)
+# reports_db.json

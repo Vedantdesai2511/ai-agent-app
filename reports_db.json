@@ -1,0 +1,191 @@
+{
+    "_default": {
+        "1": {
+            "report_id": 1756073334,
+            "chat_id": 12345,
+            "status": "approved",
+            "name": "Test Subject",
+            "offender_email": "test@example.com",
+            "official_email": "official@gov.com",
+            "draft": "This is a test email draft.",
+            "created_at": 1756073334.1285172,
+            "follow_up_count": 0
+        },
+        "2": {
+            "report_id": 1756073431,
+            "chat_id": 12345,
+            "status": "approved",
+            "name": "Test Subject",
+            "offender_email": "test@example.com",
+            "official_email": "official@gov.com",
+            "draft": "This is a test email draft.",
+            "created_at": 1756073431.5593846,
+            "follow_up_count": 0
+        },
+        "3": {
+            "report_id": 1756073463,
+            "chat_id": 977431135,
+            "status": "approved",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unregistered and Illegal Catering Business Operation - John Pape\n\nDear Texas Government Official,\n\nThis email formally reports the operation of an unregistered and illegal catering business conducted by John Pape (john.pape@gmasil.com).  This operation is in violation of state regulations and poses significant risks to public safety and the economic well-being of legitimate businesses.\n\nMr. Pape's catering business is operating without the necessary state registration, thereby evading taxes and creating unfair competition for established, tax-paying restaurants in the area.  This illegal activity results in a direct loss of state tax revenue.\n\nFurthermore, the operation presents substantial hazards to the surrounding residential zone. The lack of regulation exposes the community to potential fire risks stemming from improper cooking equipment and setups, as well as significant food safety hazards due to the absence of a properly inspected and regulated kitchen facility.\n\nWe request an immediate investigation into Mr. Pape's activities to ensure compliance with all applicable state regulations.  This investigation should encompass the verification of business registration, tax compliance, and a thorough assessment of the safety hazards presented by this unregulated operation.\n\nSincerely,\n",
+            "created_at": 1756073463.7691,
+            "follow_up_count": 0
+        },
+        "4": {
+            "report_id": 1756073733,
+            "chat_id": 977431135,
+            "status": "cancelled",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unlicensed and Unregulated Catering Business Operating in [City, Texas]\n\nDear Texas Government Official,\n\nThis email formally reports the operation of an unlicensed and unregulated catering business within the state of Texas, specifically in [City, Texas].  This operation is conducted by an individual named John Pape, whose email address is john.pape@gmasil.com.\n\nMr. Pape's business is operating illegally as it is not registered with the state, resulting in a significant loss of tax revenue for the state of Texas.  Furthermore, the operation negatively impacts legitimate, tax-paying restaurant businesses in the area by creating unfair competition.\n\nThe operation poses several significant hazards.  The unregulated nature of the kitchen presents potential fire safety risks stemming from improper cooking setups and, more critically, considerable food safety hazards due to the absence of state-mandated health and safety inspections.  The operation is currently being conducted in a residential zone, exacerbating these concerns.\n\nWe request an immediate investigation into Mr. Pape's catering business to ensure compliance with all relevant state regulations and to mitigate the public safety risks involved.  Failure to address this issue will continue to allow unfair competition, pose significant health and safety hazards, and result in continued loss of state tax revenue.\n\nSincerely,\n",
+            "created_at": 1756073733.3258653,
+            "follow_up_count": 0
+        },
+        "5": {
+            "report_id": 1756073746,
+            "chat_id": 977431135,
+            "status": "approved",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unlicensed and Unregulated Catering Business Operating in Violation of State Regulations\n\nDear Texas Government Official,\n\nThis email formally reports the operation of an unlicensed and unregulated catering business operating within the state of Texas, causing significant concerns regarding public safety, fair business practices, and state tax revenue.\n\nThe business is being operated by an individual identified as John Pape, whose email address is john.pape@gmasil.com.  This operation is not registered with the state and is therefore operating illegally, in direct violation of Texas regulations governing food service establishments.\n\nThe illegal operation of this catering business negatively impacts legitimate, tax-paying restaurant businesses in the area, creating unfair competition.  Furthermore, its operation within a residential zone presents significant hazards.  Improper cooking setups pose a potential fire risk, while the lack of regulation exposes consumers to considerable food safety risks due to an unregulated kitchen environment.\n\nThis non-compliance results in a direct loss of state tax revenue.\n\nWe request an immediate investigation into Mr. Pape's catering business and the enforcement of relevant state regulations to rectify this situation.  We are prepared to cooperate fully and provide any further information necessary to support this complaint.\n\nSincerely,\n",
+            "created_at": 1756073746.8474114,
+            "follow_up_count": 0
+        },
+        "6": {
+            "report_id": 1756075857,
+            "chat_id": 977431135,
+            "status": "cancelled",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unlicensed and Unregulated Catering Business Operating in Violation of State Law\n\nDear Texas Government Official,\n\nThis email constitutes a formal complaint regarding an unlicensed catering business operating illegally within the state of Texas.  The business is being operated by an individual named John Pape, who can be contacted at john.pape@gmasil.com.\n\nMr. Pape's catering operation is entirely unregistered with the state, placing it in direct violation of state regulations governing food service establishments.  This illegal activity negatively impacts legitimate, tax-paying restaurant businesses in the area by creating unfair competition and undermining the established regulatory framework.\n\nFurthermore, the operation presents significant public safety hazards.  Its location within a residential zone raises serious concerns regarding potential fire hazards stemming from improper cooking equipment and setups, and poses considerable food safety risks due to the lack of regulated kitchen facilities and adherence to state health codes.\n\nThe state is experiencing a direct loss of tax revenue as a result of this unregistered and unregulated business activity.\n\nWe therefore request a prompt and thorough investigation into Mr. Pape's catering operation to determine the extent of its non-compliance with state laws and regulations, and to take appropriate action to cease its illegal operation.  We urge swift action to address the public safety concerns and the economic impact of this illegal activity.\n\nSincerely,\n",
+            "created_at": 1756075857.1031868,
+            "follow_up_count": 0
+        },
+        "7": {
+            "report_id": 1756075875,
+            "chat_id": 977431135,
+            "status": "sent",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unlicensed and Illegal Catering Operation - John Pape\n\nDear Texas Government Official,\n\nThis email serves as a formal complaint regarding an unlicensed and illegal catering operation being conducted by an individual named John Pape (john.pape@gmasil.com) within the state of Texas.  This operation is operating without the necessary state registration and permits, resulting in a number of serious concerns.\n\nThe operation of this unregistered business constitutes a violation of state regulations and negatively impacts legitimate, tax-paying restaurant businesses in the area by creating unfair competition.  Furthermore, the business poses significant hazards to public safety and welfare.  The lack of regulation presents considerable risks, including potential fire hazards from improper cooking setups and serious food safety concerns due to the absence of a regulated kitchen environment.  This is particularly problematic given the apparent operation within a residential zone.\n\nThe failure to register and operate according to state guidelines also results in a direct loss of tax revenue to the state.\n\nWe formally request a thorough investigation into the activities of John Pape and his unregistered catering business. We urge prompt action to ensure compliance with state regulations and to mitigate the risks identified above.\n\nSincerely,\n",
+            "created_at": 1756075875.610826,
+            "follow_up_count": 0
+        },
+        "8": {
+            "report_id": 1756127413,
+            "chat_id": 977431135,
+            "status": "sent",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unlicensed and Illegal Catering Business Operation - John Pape\n\nDear Texas Government Official,\n\nThis email formally reports the operation of an unlicensed and illegal catering business conducted by John Pape (john.pape@gmasil.com).  This business is operating without the necessary state registration and permits, in violation of Texas law.\n\nThis illegal operation poses several significant problems.  Firstly, it undermines legitimate, tax-paying restaurant businesses in the area by engaging in unfair competition.  Secondly, it presents considerable safety hazards.  The operation is being conducted in a residential zone, creating potential fire risks due to improper cooking equipment and significant food safety concerns stemming from an unregulated kitchen environment.  Finally, the state is experiencing a direct loss of tax revenue as a result of this unregistered and untaxed business activity.\n\nWe request an immediate investigation into Mr. Pape's catering activities and the enforcement of all applicable state regulations.  We believe prompt action is crucial to address the legal violations, mitigate the safety hazards, and ensure a level playing field for legitimate businesses in the area.\n\nSincerely,\n",
+            "created_at": 1756127413.784146,
+            "follow_up_count": 0
+        },
+        "9": {
+            "report_id": 1756128547,
+            "chat_id": 977431135,
+            "status": "sent",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Dear Texas Government Official,\n\nThis email concerns the operation of an unregistered and unlicensed catering business by an individual named John Pape (email: john.pape@gmasil.com), which is operating illegally within the state of Texas.  This activity poses significant risks to public safety and undermines legitimate businesses.\n\nMr. Pape\u2019s catering operation is conducted without the necessary state registrations and permits, resulting in a direct violation of state regulations governing food service establishments.  This unlawful activity negatively impacts legitimate, tax-paying restaurant businesses in the area, creating unfair competition.\n\nFurthermore, the operation of this business in a residential zone presents considerable public safety hazards.  Improper cooking setups pose a significant fire risk, and the lack of regulation presents clear food safety concerns stemming from an unregulated kitchen environment.\n\nThis illegal operation also represents a substantial loss of tax revenue for the state.  As Mr. Pape is not registered with the state, he is not paying the required taxes, depriving the state of its due revenue.\n\nWe request a prompt investigation into the activities of John Pape and his unregistered catering business.  We believe that immediate action is required to address the legal, public safety, and economic concerns raised by this situation.\n\nSincerely,\n",
+            "created_at": 1756128547.669846,
+            "follow_up_count": 0
+        },
+        "10": {
+            "report_id": 1756134171,
+            "chat_id": 977431135,
+            "status": "sent",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Illegal Catering Business Operation - John Pape\n\nDear Texas Government Official,\n\nThis email serves as a formal complaint regarding the illegal operation of an unregistered catering business by Mr. John Pape (john.pape@gmasil.com).  This operation is conducted without the necessary state registration and licensing, resulting in several serious concerns.\n\nMr. Pape's unregistered catering business is operating in violation of state regulations, directly impacting legitimate, tax-paying restaurant businesses in the area by creating unfair competition.  Furthermore, his operation presents significant safety hazards.  The business is being conducted within a residential zone, creating potential fire risks due to improper cooking setups and posing serious food safety concerns stemming from an unregulated kitchen environment.\n\nThe lack of state registration and licensing for this business constitutes a clear evasion of tax obligations, resulting in a loss of revenue for the state of Texas.\n\nWe formally request a thorough investigation into Mr. John Pape's catering activities to ensure compliance with all applicable state regulations and to address the safety and economic ramifications of his illegal operation.  We are prepared to cooperate fully with any investigation.\n\nSincerely,\n",
+            "created_at": 1756134171.7579749,
+            "follow_up_count": 0
+        },
+        "11": {
+            "report_id": 1756134510,
+            "chat_id": 977431135,
+            "status": "sent",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unlicensed and Unregulated Catering Business Operating in [City, Texas]\n\nDear Texas Government Official,\n\nThis email constitutes a formal report regarding the illegal operation of an unregistered catering business in [City, Texas], conducted by an individual identified as John Pape (john.pape@gmasil.com).\n\nMr. Pape's business is operating without the necessary state licenses and permits, in direct violation of Texas law.  This unlawful activity has several detrimental consequences:\n\n1. **Unfair Competition:**  The operation of this unregistered business creates unfair competition for legitimate, tax-paying restaurants in the area, undermining their ability to operate profitably and comply with all applicable regulations.\n\n2. **Significant Public Safety Hazards:**  Mr. Pape's catering business is operating within a residential zone, creating substantial public safety hazards.  Improper cooking setups pose a significant fire risk, and the lack of regulatory oversight of food preparation and handling presents considerable food safety concerns.\n\n3. **Tax Evasion:** The unregistered nature of this business results in a loss of tax revenue for the state of Texas.\n\nWe request a prompt and thorough investigation into the activities of John Pape and his unregistered catering business. We believe that immediate action is necessary to address the legal violations, public safety hazards, and economic impact of this operation.  We are prepared to cooperate fully in providing any additional information that may be required.\n\n\nSincerely,\n",
+            "created_at": 1756134510.699332,
+            "follow_up_count": 0
+        },
+        "12": {
+            "report_id": 1756143987,
+            "chat_id": 977431135,
+            "status": "sent",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unlicensed and Illegal Catering Operation \u2013 John Pape\n\nDear Texas Government Official,\n\nThis email constitutes a formal complaint regarding an unlicensed and illegal catering business operating within the state of Texas, posing significant public safety and economic risks.\n\nThe business is being conducted by an individual identified as John Pape, reachable at john.pape@gmasil.com.  Mr. Pape\u2019s operation is unregistered with the state, operating in violation of Texas law.  This illegal activity directly undermines legitimate, tax-paying restaurant businesses in the area, creating unfair competition and harming the local economy.\n\nFurthermore, Mr. Pape's catering operation is conducted in a residential zone, creating significant public safety hazards.  The lack of proper permits and regulation raises serious concerns regarding potential fire hazards from inadequate cooking equipment and facilities, as well as substantial food safety risks stemming from an unregulated kitchen environment.\n\nThe state is experiencing a direct loss of tax revenue due to Mr. Pape's non-compliance with state regulations.\n\nWe formally request a thorough investigation into this matter and the subsequent enforcement of relevant Texas laws concerning business registration, food safety, and tax compliance.  We are prepared to cooperate fully with any investigation.\n\nSincerely,\n",
+            "created_at": 1756143987.1163728,
+            "follow_up_count": 0
+        },
+        "13": {
+            "report_id": 1756145228,
+            "chat_id": 977431135,
+            "status": "sent",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Dear Texas Government Official,\n\nThis email formally reports the illegal operation of a catering business conducted by John Pape (john.pape@gmasil.com) within the state of Texas.  This business is operating without the necessary state registration and permits, in direct violation of Texas law.\n\nThis unregistered operation poses several significant concerns.  Firstly, its existence directly undermines legitimate, tax-paying restaurant businesses in the area, creating unfair competition. Secondly, the operation presents considerable public safety hazards.  The catering activities appear to be conducted within a residential zone, creating potential fire risks due to improper cooking equipment and setups, and significant food safety concerns arising from an unregulated kitchen environment.\n\nFinally, the state is experiencing a direct loss of tax revenue due to this unregistered and untaxed business activity.\n\nWe request a prompt investigation into Mr. Pape\u2019s catering business to verify its compliance with all applicable state regulations and to take appropriate action to rectify this illegal operation. We urge swift intervention to address the safety and economic concerns raised.\n\nSincerely,\n",
+            "created_at": 1756145228.6959903,
+            "follow_up_count": 0
+        },
+        "14": {
+            "report_id": 1756147358,
+            "chat_id": 977431135,
+            "status": "sent",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unlicensed and Illegal Catering Operation - John Pape\n\nDear Texas Government Official,\n\nThis email formally reports an unlicensed and illegal catering operation being conducted by John Pape (john.pape@gmasil.com) within the state of Texas.  This operation is in clear violation of state regulations governing food service businesses.\n\nMr. Pape's catering business is not registered with the state, thereby operating entirely outside the framework of legal requirements. This illegal activity directly harms legitimate, tax-paying restaurant businesses in the area by creating unfair competition.\n\nFurthermore, the operation poses significant hazards.  Its location in a residential zone presents potential fire risks due to likely improper cooking equipment and setup, as well as substantial food safety concerns stemming from the absence of regulated kitchen facilities and oversight.\n\nThe state is also experiencing a loss of tax revenue as a result of this unregistered and untaxed enterprise.\n\nWe request an immediate investigation into this matter to ensure compliance with state regulations, protect public safety, and level the playing field for legitimate businesses.  We are prepared to provide further information as needed to support this complaint.\n\nSincerely,\n",
+            "created_at": 1756147358.964545,
+            "follow_up_count": 0
+        },
+        "15": {
+            "report_id": 1756249530,
+            "chat_id": 977431135,
+            "status": "cancelled",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Subject: Urgent: Report of Unlicensed and Unregulated Catering Business Operating in Violation of State Regulations\n\nDear Texas Government Official,\n\nThis email constitutes a formal report regarding an unlicensed and unregulated catering business operating within the state of Texas, posing significant public safety and economic risks.\n\nThe business is being operated by an individual identified as John Pape, whose contact email address is john.pape@gmasil.com.  This operation is not registered with the state and is therefore operating illegally, in direct violation of state regulations governing food service establishments.\n\nThis illicit activity negatively impacts legitimate, tax-paying restaurant businesses in the area by creating unfair competition.  Furthermore, the operation presents considerable public safety hazards.  The business is being conducted in a residential zone, resulting in potential fire hazards due to improper cooking setups and significant food safety risks stemming from the lack of a regulated kitchen environment.\n\nThe operation of this unregistered business results in a direct loss of tax revenue for the state of Texas.\n\nWe respectfully request a prompt and thorough investigation into the activities of Mr. Pape and his unregistered catering business. We urge the appropriate authorities to take swift action to ensure compliance with state regulations, address the public safety concerns, and protect the interests of legitimate businesses within the state.\n\nSincerely,\n",
+            "created_at": 1756249530.2852328,
+            "follow_up_count": 0
+        },
+        "16": {
+            "report_id": 1756256300,
+            "chat_id": 977431135,
+            "status": "cancelled",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Dear Texas Government Official,\n\nThis email formally reports the illegal operation of an unregistered catering business conducted by John Pape (john.pape@gmasil.com).  This operation poses significant risks to public safety and undermines legitimate, tax-paying businesses in the area.\n\nMr. Pape's catering business is operating without the necessary state registration, thus violating state regulations and resulting in a loss of tax revenue for the state of Texas.  This illegal activity creates an unfair competitive advantage against established restaurants operating within the law.\n\nFurthermore, the business operates within a residential zone, creating considerable hazards.  The lack of regulation poses significant fire risks due to potentially improper cooking equipment and setups, and presents substantial food safety concerns resulting from an unregulated kitchen environment.\n\nWe respectfully request a prompt investigation into this matter to ensure compliance with state regulations, protect public safety, and level the playing field for legitimate businesses.  We are prepared to cooperate fully with any subsequent inquiries.\n\nSincerely,\n",
+            "created_at": 1756256300.3038087,
+            "follow_up_count": 0
+        },
+        "17": {
+            "report_id": 1756256319,
+            "chat_id": 977431135,
+            "status": "sent",
+            "name": "john pape",
+            "offender_email": "john.pape@gmasil.com",
+            "official_email": "vedantdesai07@gmail.com",
+            "draft": "Dear Texas Government Official,\n\nThis email concerns the illegal operation of a catering business by an individual named John Pape (email: john.pape@gmasil.com).  This business is operating without the necessary state registration and permits, in violation of Texas law.\n\nThis unregistered operation poses several serious problems. Firstly, it creates unfair competition and negatively impacts legitimate, tax-paying restaurant businesses in the area, which are subject to stringent health and safety regulations and tax obligations.\n\nSecondly, the operation presents significant safety hazards. Conducted within a residential zone, the business likely involves improper cooking setups, posing a substantial fire risk.  Furthermore, the lack of regulation raises concerns regarding food safety and potential health risks to consumers.\n\nFinally, the state is experiencing a direct loss of tax revenue due to this unregistered and unregulated business activity.\n\nWe request a thorough investigation into the activities of Mr. Pape and his unregistered catering business.  We believe swift action is necessary to address these violations, protect the public, and ensure a level playing field for legitimate businesses in the state.\n\nSincerely,\n",
+            "created_at": 1756256319.437977,
+            "follow_up_count": 0
+        }
+    }
+}
