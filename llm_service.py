@@ -14,22 +14,64 @@ gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 # --- Main Functions ---
 
 def parse_user_input_with_gemini(text):
-    """Uses Gemini to parse user input."""
-    # *** KEY CHANGE: Updated prompt to look for an 'email_gist' ***
+    """
+    Uses Gemini to parse user input with a more robust few-shot prompt.
+    """
+    # This new prompt includes examples to teach the model how to handle complex cases.
     prompt = f"""
-    Analyze the following text and extract the required information.
-    Text: "{text}"
+    You are an expert at parsing user requests into structured JSON data. Analyze the user's text and extract the required information.
 
-    Return a JSON object with the keys: 'name', 'offender_email', 'official_email', and 'email_gist'.
-    The 'email_gist' should contain any specific details the user wants to include in the email body.
-    If a value is missing, set it to null.
+    ---
+    **Example 1 (Simple case):**
+    **User text:** "report name John Doe, email john.doe@example.com, target officials@texas.gov"
+    **Your JSON output:**
+    ```json
+    {{
+      "name": "John Doe",
+      "offender_email": "john.doe@example.com",
+      "official_email": "officials@texas.gov",
+      "email_gist": null
+    }}
+    Example 2 (Complex case with a gist):
+    User text: "please file report for john pape their email is john.pape@gmail.com, send it to vedantdesai07@gmail.com Email should say, they are located at bla bla street and they sell veg catering to Indians nearby, it works in word of mouth"
+    Your JSON output:
+    code
+    JSON
+    {{
+      "name": "John Pape",
+      "offender_email": "john.pape@gmail.com",
+      "official_email": "vedantdesai07@gmail.com",
+      "email_gist": "They are located at bla bla street and they sell veg catering to Indians nearby, it works in word of mouth."
+    }}
+    Actual User Request:
+    User text: "{text}"
+    Your JSON output:
     """
     try:
         response = gemini_model.generate_content(prompt)
-        clean_response = response.text.strip().replace("```json", "").replace("```", "")
-        return json.loads(clean_response)
+
+        # Clean up the response to extract just the JSON part
+        response_text = response.text
+
+        print(f'response_text: {response_text}')
+        # Find the first occurrence of '{'
+        start_index = response_text.find('{')
+        # Find the last occurrence of '}'
+        end_index = response_text.rfind('}')
+
+        # If we found both, slice the string and parse
+        if start_index != -1 and end_index != -1 and end_index > start_index:
+            json_string = response_text[start_index: end_index + 1]
+            print(f'json_string: {json_string}')
+            return json.loads(json_string)
+        else:
+            # If we couldn't find a valid JSON object, raise an error
+            raise ValueError("Could not find a valid JSON object in the model's response.")
+
     except Exception as e:
         print(f"An error occurred with Gemini parsing: {e}")
+        # The log will show the raw response that failed to be parsed
+        print(f"Failed to parse response: {response_text if 'response_text' in locals() else 'No response text available'}")
         return None
 
 

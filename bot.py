@@ -49,7 +49,7 @@ async def handle_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     await context.bot.send_message(chat_id=chat_id, text="Analyzing and drafting...")
 
-    parsed_data = llm_service.parse_user_input(user_message)
+    parsed_data = llm_service.parse_user_input_with_gemini(user_message)
 
     if not parsed_data or not all(
             key in parsed_data and parsed_data[key] for key in ['name', 'offender_email', 'official_email']):
