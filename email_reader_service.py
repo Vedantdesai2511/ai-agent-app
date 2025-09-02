@@ -23,20 +23,36 @@ def _decode_subject(header):
     subject = []
     for part, charset in decoded_parts:
         if isinstance(part, bytes):
-            # If charset is None, default to a common encoding like 'utf-8'
             subject.append(part.decode(charset or 'utf-8', 'ignore'))
         else:
             subject.append(part)
     return "".join(subject)
 
 
-def _parse_report_id_from_subject(subject):
-    if not subject: return None
-    match = re.search(r"\[Report ID: (\d+)\]", subject)
-    if match: return int(match.group(1))
-    return None
+def _clean_email_body(body):
+    """
+    Tries to remove quoted reply text from an email body to isolate the newest message.
+    """
+    lines = body.splitlines()
+    cutoff_patterns = [
+        "--- Original Message ---", "---Original Message---", "From:", "Sent:", "To:", "Subject:",
+    ]
+    cutoff_index = -1
+    for i, line in enumerate(lines):
+        if line.strip().startswith("On") and line.strip().endswith("wrote:"):
+            cutoff_index = i
+            break
+        if line.strip() in cutoff_patterns:
+            cutoff_index = i
+            break
+    if cutoff_index != -1:
+        cleaned_lines = lines[:cutoff_index]
+    else:
+        cleaned_lines = [line for line in lines if not line.strip().startswith('>')]
+    return "\n".join(cleaned_lines).strip()
 
 
+# --- THIS IS THE MISSING FUNCTION ---
 def check_for_reply_to_report(report_id):
     """
     Checks the inbox for a reply to a specific report ID.
@@ -55,6 +71,7 @@ def check_for_reply_to_report(report_id):
 
         mail.logout()
 
+        # If the search was successful and returned any message numbers, a reply exists.
         if status == "OK" and messages[0]:
             print(f"Found a reply for report {report_id}.")
             return True
@@ -65,12 +82,13 @@ def check_for_reply_to_report(report_id):
         return False
 
 
+# --- END OF MISSING FUNCTION ---
+
+
 def check_for_replies():
     """
-    Checks for ALL unread email replies and extracts the report ID.
-    This remains as a general catch-all.
+    Checks for ALL unread email replies, extracts the report ID, and cleans the reply body.
     """
-    # ... (This entire function remains exactly the same as the last version) ...
     try:
         mail = imaplib.IMAP4_SSL(IMAP_SERVER)
         mail.login(IMAP_USER, IMAP_PASSWORD)
@@ -79,34 +97,53 @@ def check_for_replies():
         if status != "OK":
             mail.logout()
             return []
+
         message_numbers = messages[0].split()
         if not message_numbers or message_numbers == [b'']:
             mail.logout()
             return []
+
         replies = []
         for num in message_numbers:
             status, data = mail.fetch(num, "(RFC822)")
             if status != "OK": continue
-            msg_data = data[0][1]
-            msg = email.message_from_bytes(msg_data)
+
+            msg = email.message_from_bytes(data[0][1])
             subject = _decode_subject(msg["Subject"])
-            parsed_id = _parse_report_id_from_subject(subject)
-            if parsed_id:
+            report_id = _parse_report_id_from_subject(subject)
+
+            if report_id:
                 body = ""
                 if msg.is_multipart():
                     for part in msg.walk():
-                        if part.get_content_type() == "text/plain" and "attachment" not in str(part.get("Content-Disposition")):
-                            try: body = part.get_payload(decode=True).decode(); break
-                            except: continue
+                        if part.get_content_type() == "text/plain" and "attachment" not in str(
+                                part.get("Content-Disposition")):
+                            try:
+                                body = part.get_payload(decode=True).decode()
+                                break
+                            except:
+                                continue
                 else:
-                    try: body = msg.get_payload(decode=True).decode()
-                    except: body = ""
-                replies.append({"report_id": parsed_id, "snippet": body[:200]})
+                    try:
+                        body = msg.get_payload(decode=True).decode()
+                    except:
+                        body = ""
+
+                cleaned_body = _clean_email_body(body)
+                replies.append({"report_id": report_id, "full_reply": cleaned_body})
+
         mail.logout()
         return replies
     except Exception as e:
         print(f"An error occurred while checking for replies: {e}")
         return []
+
+
+def _parse_report_id_from_subject(subject):
+    if not subject: return None
+    match = re.search(r"\[Report ID: (\d+)\]", subject)
+    if match: return int(match.group(1))
+    return None
 
 
 if __name__ == '__main__':

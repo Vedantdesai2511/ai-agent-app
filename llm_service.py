@@ -15,11 +15,11 @@ gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 
 def parse_user_input_with_gemini(text):
     """
-    Uses Gemini to parse user input with a more robust few-shot prompt.
+    Uses Gemini to parse user input into structured JSON, including a flexible details dictionary.
     """
-    # This new prompt includes examples to teach the model how to handle complex cases.
     prompt = f"""
-    You are an expert at parsing user requests into structured JSON data. Analyze the user's text and extract the required information.
+    You are an expert at parsing user requests into structured JSON. Analyze the user's text and extract the required information.
+    The user can provide any number of details about the offender. You must capture all of them in a nested JSON object called "offender_details".
 
     ---
     **Example 1 (Simple case):**
@@ -30,48 +30,44 @@ def parse_user_input_with_gemini(text):
       "name": "John Doe",
       "offender_email": "john.doe@example.com",
       "official_email": "officials@texas.gov",
-      "email_gist": null
+      "offender_details": {{}}
     }}
-    Example 2 (Complex case with a gist):
-    User text: "please file report for john pape their email is john.pape@gmail.com, send it to vedantdesai07@gmail.com Email should say, they are located at bla bla street and they sell veg catering to Indians nearby, it works in word of mouth"
-    Your JSON output:
-    code
-    JSON
+    ```
+
+    **Example 2 (Complex case with multiple details):**
+    **User text:** "please file report for john pape their email is john.pape@gmail.com, send it to vedantdesai07@gmail.com. His address is 123 Texas Rd, Houston, TX 77001 and phone is 832-555-1234. He sells veg catering to Indians nearby, it works by word of mouth."
+    **Your JSON output:**
+    ```json
     {{
       "name": "John Pape",
       "offender_email": "john.pape@gmail.com",
       "official_email": "vedantdesai07@gmail.com",
-      "email_gist": "They are located at bla bla street and they sell veg catering to Indians nearby, it works in word of mouth."
+      "offender_details": {{
+        "Address": "123 Texas Rd, Houston, TX 77001",
+        "Phone Number": "832-555-1234",
+        "Notes": "He sells veg catering to Indians nearby, it works by word of mouth."
+      }}
     }}
-    Actual User Request:
-    User text: "{text}"
-    Your JSON output:
+    ```
+    ---
+    **Actual User Request:**
+    **User text:** "{text}"
+    **Your JSON output:**
     """
     try:
+        # ... (The Gemini call and JSON extraction logic remains the same) ...
         response = gemini_model.generate_content(prompt)
-
-        # Clean up the response to extract just the JSON part
         response_text = response.text
-
-        print(f'response_text: {response_text}')
-        # Find the first occurrence of '{'
         start_index = response_text.find('{')
-        # Find the last occurrence of '}'
         end_index = response_text.rfind('}')
-
-        # If we found both, slice the string and parse
         if start_index != -1 and end_index != -1 and end_index > start_index:
             json_string = response_text[start_index: end_index + 1]
-            print(f'json_string: {json_string}')
             return json.loads(json_string)
         else:
-            # If we couldn't find a valid JSON object, raise an error
             raise ValueError("Could not find a valid JSON object in the model's response.")
-
     except Exception as e:
         print(f"An error occurred with Gemini parsing: {e}")
-        # The log will show the raw response that failed to be parsed
-        print(f"Failed to parse response: {response_text if 'response_text' in locals() else 'No response text available'}")
+        print(f"Failed to parse response: {response.text if 'response' in locals() else 'No response text available'}")
         return None
 
 
@@ -85,10 +81,11 @@ def generate_email_with_gemini(name, offender_email, gist=None): # <-- Add gist 
         print(f"An error occurred with Gemini generation: {e}")
         return "Error: Could not generate email draft."
 
+
 def generate_follow_up_email(name, offender_email, original_draft):
     """Generates a follow-up email."""
-    prompt = f"""
-    Please generate a polite but firm follow-up email. The original email was sent to a Texas government official to report an illegitimate catering business.
+    prompt = f""" Please generate a polite but firm follow-up email. The original email was sent to a Texas 
+    government official to report an illegitimate catering business.
 
     The key details of the original report are:
     - Business operated by: {name} ({offender_email})
@@ -115,18 +112,16 @@ def generate_follow_up_email(name, offender_email, original_draft):
 # --- Helper Function ---
 
 
-def _build_email_prompt(name, offender_email, gist=None):  # <-- Add gist parameter
-    """A helper to create the consistent email prompt for both models."""
+def _build_email_prompt(name, offender_email, offender_details=None):
+    """A helper to create the email prompt, now with a dynamic details section."""
 
-    # *** KEY CHANGE: Conditionally add the user's gist to the prompt ***
-    gist_section = ""
-    if gist:
-        gist_section = f"""
-        In addition to the standard points, it is crucial to professionally integrate the following user-provided details into the body of the email:
-        ---
-        {gist}
-        ---
-        """
+    details_section = ""
+    if offender_details:
+        # Start the section with a clear header
+        details_section += "\nAdditional user-provided details about the operation are as follows:\n"
+        # Loop through the dictionary and format each key-value pair
+        for key, value in offender_details.items():
+            details_section += f"- {key}: {value}\n"
 
     return f"""
     Please generate a highly formal and professional email to be sent to a Texas government official. The purpose of this email is to report an illegitimate catering business.
@@ -137,20 +132,30 @@ def _build_email_prompt(name, offender_email, gist=None):  # <-- Add gist parame
     3. This operation negatively impacts legitimate, tax-paying restaurant businesses in the area.
     4. It creates significant hazards in a residential zone, including potential fire hazards and food safety hazards.
     5. The state is losing tax revenue as this business is not paying taxes.
-    {gist_section}
+    {details_section}
     The tone should be serious, direct, and to the point. Make it clear that we are requesting an investigation. Start with a formal salutation like "Dear Texas Government Official," and end it with "Sincerely,". Do not include a placeholder for the sender's name.
     """
 
 
 # ... (The rest of the file, including the wrapper functions, can stay the same) ...
 # Update the wrapper function to accept the new argument
-def generate_email_draft(name, offender_email, gist=None):
-    return generate_email_with_gemini(name, offender_email, gist)
+def generate_email_draft(name, offender_email, offender_details=None):
+    """Generates a formal email draft using Gemini, now with a details dictionary."""
+    prompt = _build_email_prompt(name, offender_email, offender_details)
+    try:
+        response = gemini_model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"An error occurred with Gemini generation: {e}")
+        return "Error: Could not generate email draft."
 
 
 # --- Test Block ---
 if __name__ == '__main__':
-    test_input_with_gist = "please file report for john pape their email is john.pape@gmail.com, send it to vedantdesai07@gmail.com. email should say, john pape restaurant is located at 123 indian street in huston, you can go to their website to see that you can order things there for catering but they don't have legit business"
+    test_input_with_gist = ("please file report for john pape their email is john.pape@gmail.com, send it to "
+                            "vedantdesai07@gmail.com. email should say, john pape restaurant is located at 123 indian "
+                            "street in huston, you can go to their website to see that you can order things there for "
+                            "catering but they don't have legit business")
 
     print("--- 1. Testing Input Parsing with Gist ---")
     parsed_data = parse_user_input_with_gemini(test_input_with_gist)

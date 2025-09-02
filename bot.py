@@ -18,7 +18,7 @@ load_dotenv()
 
 # --- CONFIGURATION CONSTANT ---
 # The single source of truth for the follow-up period in days.
-FOLLOW_UP_DAYS = ((1 / 1440)*2)
+FOLLOW_UP_DAYS = 7
 
 # Setup logging
 logging.basicConfig(
@@ -41,8 +41,8 @@ async def post_init_jobs(application: Application):
     # We are no longer creating a new scheduler here, just using the global one.
 
     # For your testing:
-    scheduler.add_job(send_follow_ups, 'interval', minutes=1, args=[application])
-    scheduler.add_job(check_for_replies_job, 'interval', minutes=1, args=[application])
+    scheduler.add_job(send_follow_ups, 'interval', days=FOLLOW_UP_DAYS, args=[application])
+    scheduler.add_job(check_for_replies_job, 'interval', minutes=15, args=[application])
 
     # For production:
     # scheduler.add_job(send_follow_ups, 'interval', days=FOLLOW_UP_DAYS, args=[application])
@@ -70,7 +70,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def handle_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handles a new report request, drafts an email, and sets it up for approval."""
+    """Handles a new report request, now using the flexible details parser."""
     user_message = update.message.text
     chat_id = update.effective_chat.id
 
@@ -79,22 +79,22 @@ async def handle_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                                        text="I'm currently waiting for your response on the last draft. Please approve or cancel it first.")
         return
 
-    await context.bot.send_message(chat_id=chat_id, text="Analyzing and drafting...")
+    await context.bot.send_message(chat_id=chat_id, text="Analyzing your report and drafting the email...")
 
     parsed_data = llm_service.parse_user_input_with_gemini(user_message)
 
-    if not parsed_data or not all(
-            key in parsed_data and parsed_data[key] for key in ['name', 'offender_email', 'official_email']):
+    if not parsed_data or not all(key in parsed_data for key in ['name', 'offender_email', 'official_email']):
         await context.bot.send_message(chat_id=chat_id,
-                                       text="Sorry, I couldn't extract all the required details. Please provide the person's name, their email, and the official's email.")
+                                       text="Sorry, I couldn't extract all the required details. Please provide at least the person's name, their email, and the official's email.")
         return
 
-    email_gist = parsed_data.get('email_gist')
+    # --- KEY CHANGE: Use the new 'offender_details' dictionary ---
+    offender_details = parsed_data.get('offender_details')
 
     email_draft = llm_service.generate_email_draft(
         name=parsed_data['name'],
         offender_email=parsed_data['offender_email'],
-        gist=email_gist
+        offender_details=offender_details  # <-- Pass the new details dictionary here
     )
 
     report_id = database_service.create_report(
@@ -134,7 +134,8 @@ async def handle_approval_response(update: Update, context: ContextTypes.DEFAULT
     await update.message.reply_text(
         f"✅ Approved! Sending the email for Report {report_id} to {report['official_email']}...")
 
-    subject = f"Urgent Report Regarding Illegitimate Business Operation: {report['name']}"
+    subject = (f"Urgent: Reporting Unlicensed and Illegal Food Catering Operations - Potential Public Safety Hazard - "
+               f"Requesting Action to stop this catering operation: {report['name']}")
 
     email_sent_successfully, message_id = email_service.send_email(
         recipient_email=report['official_email'],
@@ -173,42 +174,28 @@ async def handle_cancellation_response(update: Update, context: ContextTypes.DEF
 async def send_follow_ups(context: ContextTypes.DEFAULT_TYPE):
     """
     Job to send follow-up emails for reports that haven't been responded to.
-    This now includes a check for replies just before sending.
     """
+    # ... (This function remains exactly the same as the last version) ...
     print("--- Running follow-up job ---")
-
-    # 1. Get a list of candidates that are old enough
     reports = database_service.get_reports_for_follow_up(days_since_last_update=FOLLOW_UP_DAYS)
-
     if not reports:
         print("No reports due for a follow-up.")
         return
-
     print(f"Found {len(reports)} candidate(s) for follow-up.")
-
-    # 2. Loop through each candidate and check for replies before sending
     for report in reports:
         report_id = report['report_id']
-
-        # 3. Perform a targeted check for a reply to THIS report
         has_reply = email_reader_service.check_for_reply_to_report(report_id)
-
         if has_reply:
-            # 4. If a reply exists, update the status and do NOT send a follow-up
             print(f"Reply found for Report {report_id}. Cancelling follow-up and updating status.")
             database_service.update_report_status(report_id, 'reply_received')
-            continue  # Move to the next report
-
-        # 5. If NO reply was found, proceed with sending the follow-up
+            continue
         print(f"No reply found for Report {report_id}. Proceeding with follow-up.")
         if not report.get('message_id'):
             print(f"Skipping follow-up for report {report_id} because it has no Message-ID.")
             continue
-
         follow_up_draft = llm_service.generate_follow_up_email(
             report['name'], report['offender_email'], report['draft']
         )
-
         email_service.send_email(
             recipient_email=report['official_email'],
             subject=f"Urgent Report Regarding Illegitimate Business Operation: {report['name']}",
@@ -221,19 +208,56 @@ async def send_follow_ups(context: ContextTypes.DEFAULT_TYPE):
 
 async def check_for_replies_job(context: ContextTypes.DEFAULT_TYPE):
     """
-    Job to check for email replies and notify the user.
+    Job to check for email replies and notify the user with the full reply content.
     """
-    print("--- Checking for email replies ---")
+    print("--- Running job: Checking for email replies ---")
     replies = email_reader_service.check_for_replies()
-    print(f'replies: {replies}')
+
+    if not replies:
+        print("No new email replies found.")
+        return
+
+    print(f"Found {len(replies)} new email(s). Processing...")
     for reply in replies:
-        report = database_service.get_report_by_id(reply['report_id'])
-        if report and report.get('status') != 'reply_received':
-            database_service.update_report_status(reply['report_id'], 'reply_received')
+        report_id = reply['report_id']
+        report = database_service.get_report_by_id(report_id)
+
+        if not report:
+            print(f"Warning: Found reply for a report ID ({report_id}) that is not in the database. Skipping.")
+            continue
+
+        # Check the status BEFORE deciding to send
+        if report.get('status') == 'reply_received':
+            print(f"Reply for Report {report_id} has already been processed. Skipping notification.")
+            continue
+
+        # If we've reached here, it's a new reply that needs processing.
+        print(f"Processing new reply for Report {report_id}...")
+
+        # 1. Send the notification FIRST
+        full_reply_text = reply.get('full_reply', "Could not extract reply content.")
+        if len(full_reply_text) > 4000:
+            full_reply_text = full_reply_text[:4000] + "\n\n[Message truncated due to length]"
+
+        notification_message = (
+            f"📢 **Reply Received for Report {report_id}**\n\n"
+            "--- Reply Content ---\n"
+            f"{full_reply_text}"
+        )
+
+        try:
             await context.bot.send_message(
                 chat_id=report['chat_id'],
-                text=f"📢 **Reply Received for Report {reply['report_id']}**\n\nSnippet:\n'{reply['snippet']}'"
+                text=notification_message
             )
+            print(f"Successfully sent Telegram notification for Report {report_id}.")
+
+            # 2. Update the status in the database AFTER successful notification
+            database_service.update_report_status(report_id, 'reply_received')
+            print(f"Updated status for Report {report_id} to 'reply_received'.")
+
+        except Exception as e:
+            print(f"Error sending Telegram notification for Report {report_id}: {e}")
 
 
 async def main() -> None:
