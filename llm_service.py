@@ -85,8 +85,35 @@ def generate_email_with_gemini(name, offender_email, gist=None): # <-- Add gist 
         print(f"An error occurred with Gemini generation: {e}")
         return "Error: Could not generate email draft."
 
+def generate_follow_up_email(name, offender_email, original_draft):
+    """Generates a follow-up email."""
+    prompt = f"""
+    Please generate a polite but firm follow-up email. The original email was sent to a Texas government official to report an illegitimate catering business.
+
+    The key details of the original report are:
+    - Business operated by: {name} ({offender_email})
+    - The original email is provided below for context.
+
+    The follow-up email should:
+    1.  Reference the previous email about this issue.
+    2.  Briefly reiterate the key concerns (unregistered business, safety hazards, tax evasion).
+    3.  Inquire about the status of the investigation.
+    4.  Maintain a professional and respectful tone.
+    5.  Start with "Dear Texas Government Official," and end with "Sincerely,".
+
+    --- ORIGINAL EMAIL CONTEXT ---
+    {original_draft}
+    ---
+    """
+    try:
+        response = gemini_model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"An error occurred with Gemini follow-up generation: {e}")
+        return "Error: Could not generate follow-up email draft."
 
 # --- Helper Function ---
+
 
 def _build_email_prompt(name, offender_email, gist=None):  # <-- Add gist parameter
     """A helper to create the consistent email prompt for both models."""
