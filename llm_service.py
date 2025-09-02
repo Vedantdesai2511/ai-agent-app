@@ -82,25 +82,31 @@ def generate_email_with_gemini(name, offender_email, gist=None): # <-- Add gist 
         return "Error: Could not generate email draft."
 
 
-def generate_follow_up_email(name, offender_email, original_draft):
-    """Generates a follow-up email."""
-    prompt = f""" Please generate a polite but firm follow-up email. The original email was sent to a Texas 
-    government official to report an illegitimate catering business.
+def generate_follow_up_email(name, offender_email, offender_details=None):
+    """
+    Generates a follow-up email using only the key details, not the full original draft.
+    This is much more token-efficient.
+    """
+
+    # We can reuse the details formatting from our main email prompt
+    details_section = ""
+    if offender_details:
+        details_section += "\nThe original report included these details:\n"
+        for key, value in offender_details.items():
+            details_section += f"- {key}: {value}\n"
+
+    prompt = f"""
+    Please generate a polite but firm follow-up email. The original email was sent to a Texas government official to report an illegitimate catering business.
 
     The key details of the original report are:
     - Business operated by: {name} ({offender_email})
-    - The original email is provided below for context.
-
+    {details_section}
     The follow-up email should:
-    1.  Reference the previous email about this issue.
+    1.  Reference a previous email sent about this issue (e.g., "Following up on my previous email...").
     2.  Briefly reiterate the key concerns (unregistered business, safety hazards, tax evasion).
-    3.  Inquire about the status of the investigation.
+    3.  Politely inquire about the status of the investigation.
     4.  Maintain a professional and respectful tone.
     5.  Start with "Dear Texas Government Official," and end with "Sincerely,".
-
-    --- ORIGINAL EMAIL CONTEXT ---
-    {original_draft}
-    ---
     """
     try:
         response = gemini_model.generate_content(prompt)
@@ -110,7 +116,6 @@ def generate_follow_up_email(name, offender_email, original_draft):
         return "Error: Could not generate follow-up email draft."
 
 # --- Helper Function ---
-
 
 def _build_email_prompt(name, offender_email, offender_details=None):
     """A helper to create the email prompt, now with a dynamic details section."""
