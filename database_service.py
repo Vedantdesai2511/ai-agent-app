@@ -5,28 +5,25 @@ import time
 db = TinyDB('reports_db.json', indent=4)
 
 
-def create_report(chat_id, name, offender_email, official_email, draft):
+def create_report(chat_id, name, offender_email, official_email, draft, offender_details):
     """
-    Saves a new report to the database with a unique ID and initial status.
-
-    Returns:
-        The integer ID of the newly created report.
+    Saves a new report to the database. The subject is no longer stored.
     """
-    # Generate a unique ID based on the current timestamp
     report_id = int(time.time())
 
     db.insert({
         'report_id': report_id,
         'chat_id': chat_id,
-        'status': 'awaiting_approval',  # The initial state of any new report
+        'status': 'awaiting_approval',
         'name': name,
         'offender_email': offender_email,
         'official_email': official_email,
-        'draft': draft,
+        'draft': draft,  # This field now holds the email body
+        'offender_details': offender_details,
         'created_at': time.time(),
         'last_updated_at': time.time(),
         'follow_up_count': 0,
-        'message_id': None  # New field to store the email's Message-ID
+        'message_id': None
     })
 
     print(f"Report {report_id} created for chat {chat_id}.")

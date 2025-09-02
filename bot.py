@@ -19,6 +19,8 @@ load_dotenv()
 # --- CONFIGURATION CONSTANT ---
 # The single source of truth for the follow-up period in days.
 FOLLOW_UP_DAYS = 7
+STANDARD_SUBJECT_LINE = ("Urgent: Reporting Unlicensed and Illegal Food Catering Operations - Potential Public Safety Hazard - "
+                         "Requesting Action to stop this catering operation: {name}")
 
 # Setup logging
 logging.basicConfig(
@@ -85,10 +87,10 @@ async def handle_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     if not parsed_data or not all(key in parsed_data for key in ['name', 'offender_email', 'official_email']):
         await context.bot.send_message(chat_id=chat_id,
-                                       text="Sorry, I couldn't extract all the required details. Please provide at least the person's name, their email, and the official's email.")
+                                       text="Sorry, I couldn't extract all the required details. Please provide at "
+                                            "least the person's name, their email, and the official's email.")
         return
 
-    # --- KEY CHANGE: Use the new 'offender_details' dictionary ---
     offender_details = parsed_data.get('offender_details')
 
     email_draft = llm_service.generate_email_draft(
@@ -98,15 +100,19 @@ async def handle_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
 
     report_id = database_service.create_report(
-        chat_id, parsed_data['name'], parsed_data['offender_email'], parsed_data['official_email'], email_draft
+        chat_id, parsed_data['name'], parsed_data['offender_email'], parsed_data['official_email'],
+        email_draft, offender_details
     )
 
     context.chat_data['pending_approval_id'] = report_id
+
+    subject_for_preview = STANDARD_SUBJECT_LINE.format(name=parsed_data['name'])
 
     response_message = (
         f"**New Report Draft (ID: {report_id})**\n\n"
         "Here is the draft I've prepared based on your details. Please review it carefully.\n\n"
         "-------------------------------------\n"
+        f"**Subject:** {subject_for_preview}\n\n"
         f"{email_draft}\n"
         "-------------------------------------\n\n"
         "**To approve and send, reply with 'approve' or 'yes'.**\n"
@@ -134,8 +140,7 @@ async def handle_approval_response(update: Update, context: ContextTypes.DEFAULT
     await update.message.reply_text(
         f"✅ Approved! Sending the email for Report {report_id} to {report['official_email']}...")
 
-    subject = (f"Urgent: Reporting Unlicensed and Illegal Food Catering Operations - Potential Public Safety Hazard - "
-               f"Requesting Action to stop this catering operation: {report['name']}")
+    subject = STANDARD_SUBJECT_LINE.format(name=report['name'])
 
     email_sent_successfully, message_id = email_service.send_email(
         recipient_email=report['official_email'],
@@ -193,17 +198,24 @@ async def send_follow_ups(context: ContextTypes.DEFAULT_TYPE):
         if not report.get('message_id'):
             print(f"Skipping follow-up for report {report_id} because it has no Message-ID.")
             continue
+
         follow_up_draft = llm_service.generate_follow_up_email(
-            report['name'], report['offender_email'], report['draft']
+            report['name'],
+            report['offender_email'],
+            report.get('offender_details')
         )
+
+        # --- KEY CHANGE: A standardized subject is used for follow-ups ---
+        follow_up_subject = f"Follow-Up: Urgent Report Regarding {report['name']}"
+
         email_service.send_email(
             recipient_email=report['official_email'],
-            subject=f"Urgent Report Regarding Illegitimate Business Operation: {report['name']}",
+            subject=follow_up_subject,
             body=follow_up_draft,
-            report_id=report_id,
+            report_id=report['report_id'],
             thread_message_id=report['message_id']
         )
-        database_service.increment_follow_up_count(report_id)
+        database_service.increment_follow_up_count(report['report_id'])
 
 
 async def check_for_replies_job(context: ContextTypes.DEFAULT_TYPE):

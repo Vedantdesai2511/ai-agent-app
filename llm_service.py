@@ -84,38 +84,20 @@ def generate_email_with_gemini(name, offender_email, gist=None): # <-- Add gist 
 
 def generate_follow_up_email(name, offender_email, offender_details=None):
     """
-    Generates a follow-up email using only the key details, not the full original draft.
-    This is much more token-efficient.
+    Generates the BODY of a follow-up email.
+    Returns a single string.
     """
-
-    # We can reuse the details formatting from our main email prompt
-    details_section = ""
-    if offender_details:
-        details_section += "\nThe original report included these details:\n"
-        for key, value in offender_details.items():
-            details_section += f"- {key}: {value}\n"
-
-    prompt = f"""
-    Please generate a polite but firm follow-up email. The original email was sent to a Texas government official to report an illegitimate catering business.
-
-    The key details of the original report are:
-    - Business operated by: {name} ({offender_email})
-    {details_section}
-    The follow-up email should:
-    1.  Reference a previous email sent about this issue (e.g., "Following up on my previous email...").
-    2.  Briefly reiterate the key concerns (unregistered business, safety hazards, tax evasion).
-    3.  Politely inquire about the status of the investigation.
-    4.  Maintain a professional and respectful tone.
-    5.  Start with "Dear Texas Government Official," and end with "Sincerely,".
-    """
+    prompt = _build_follow_up_prompt(name, offender_email, offender_details)
     try:
         response = gemini_model.generate_content(prompt)
-        return response.text
+        return response.text.strip()
     except Exception as e:
         print(f"An error occurred with Gemini follow-up generation: {e}")
         return "Error: Could not generate follow-up email draft."
 
-# --- Helper Function ---
+
+# --- Helper Functions ---
+
 
 def _build_email_prompt(name, offender_email, offender_details=None):
     """A helper to create the email prompt, now with a dynamic details section."""
@@ -138,9 +120,31 @@ def _build_email_prompt(name, offender_email, offender_details=None):
     4. It creates significant hazards in a residential zone, including potential fire hazards and food safety hazards.
     5. The state is losing tax revenue as this business is not paying taxes.
     {details_section}
-    The tone should be serious, direct, and to the point. Make it clear that we are requesting an investigation. Start with a formal salutation like "Dear Texas Government Official," and end it with "Sincerely,". Do not include a placeholder for the sender's name.
+    The tone should be serious, direct, and to the point. Make it clear that we are requesting an investigation. Start with a formal salutation like "Dear Texas Government Official," and end it with "Sincerely,".
+    Do not include a placeholder for the sender's name.
+    Do not include a subject line.
     """
 
+def _build_follow_up_prompt(name, offender_email, offender_details=None):
+    """A helper to create the prompt for the follow-up email body."""
+    details_section = ""
+    if offender_details:
+        details_section += "\nThe original report included these details:\n"
+        for key, value in offender_details.items():
+            details_section += f"- {key}: {value}\n"
+
+    return f"""
+    Generate the body for a polite but firm follow-up email to a Texas government official about a previously reported illegitimate catering business.
+
+    Key details of the original report:
+    - Business operated by: {name} ({offender_email})
+    {details_section}
+    The follow-up body should:
+    1. Reference the previous email.
+    2. Briefly reiterate the key concerns (unregistered business, safety hazards, tax evasion).
+    3. Politely inquire about the status of the investigation.
+    4. Maintain a professional tone. Do not include a subject line.
+    """
 
 # ... (The rest of the file, including the wrapper functions, can stay the same) ...
 # Update the wrapper function to accept the new argument
