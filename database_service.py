@@ -103,6 +103,31 @@ def increment_follow_up_count(report_id):
     return False
 
 
+def get_all_reports():
+    """
+    Retrieves all reports currently in the database.
+    """
+    return db.all()
+
+
+def delete_old_reports():
+    """
+    Deletes any report from the database that was created more than 30 days ago.
+    """
+    Report = Query()
+    # 30 days in seconds (30 * 24 hours * 60 minutes * 60 seconds)
+    one_month_ago = time.time() - (30 * 24 * 60 * 60)
+
+    # Find and remove reports where the 'created_at' timestamp is less than one_month_ago
+    deleted_reports = db.remove(Report.created_at < one_month_ago)
+
+    if deleted_reports:
+        print(f"Successfully purged {len(deleted_reports)} report(s) older than 30 days.")
+    else:
+        print("No old reports to purge.")
+    return len(deleted_reports)
+
+
 # --- Test Block ---
 if __name__ == '__main__':
     print("--- Testing Database Service ---")

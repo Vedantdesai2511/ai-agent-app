@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import time
 
 # Import our custom services
 import llm_service
@@ -283,6 +284,57 @@ async def check_for_replies_job(context: ContextTypes.DEFAULT_TYPE):
             print(f"Error sending Telegram notification for Report {report_id}: {e}")
 
 
+async def purge_old_records_job(context: ContextTypes.DEFAULT_TYPE):
+    """
+    A daily job to clean up old records from the database.
+    """
+    print("--- Running daily job: Purging old database records ---")
+    database_service.delete_old_reports()
+
+
+async def send_weekly_summary_job(context: ContextTypes.DEFAULT_TYPE):
+    """
+    A weekly job that compiles a summary of all reports and emails it.
+    """
+    print("--- Running weekly job: Compiling and sending summary report ---")
+    summary_recipient = "vedantdesai07@gmail.com"
+    reports = database_service.get_all_reports()
+
+    if not reports:
+        print("No reports in the database. Skipping weekly summary.")
+        return
+
+    # Prepare the email subject and body
+    current_date = time.strftime("%Y-%m-%d")
+    subject = f"Weekly Summary: Catering Reporter Bot Status - {current_date}"
+
+    body = f"Hello,\n\nHere is the status summary for all {len(reports)} report(s) in the system as of {current_date}.\n\n"
+    body += "----------------------------------------\n\n"
+
+    for report in reports:
+        created_time = time.strftime("%Y-%m-%d %H:%M", time.localtime(report.get('created_at', 0)))
+        updated_time = time.strftime("%Y-%m-%d %H:%M", time.localtime(report.get('last_updated_at', 0)))
+
+        body += f"**Report ID:** {report.get('report_id', 'N/A')}\n"
+        body += f"  - **Status:** {report.get('status', 'N/A').upper()}\n"
+        body += f"  - **Offender:** {report.get('name', 'N/A')} ({report.get('phone_number', 'N/A')})\n"
+        body += f"  - **Recipient:** {report.get('official_email', 'N/A')}\n"
+        body += f"  - **Created:** {created_time}\n"
+        body += f"  - **Last Update:** {updated_time}\n"
+        body += f"  - **Follow-ups Sent:** {report.get('follow_up_count', 0)}\n\n"
+
+    body += "----------------------------------------\n"
+    body += "End of report.\n"
+
+    # Send the email using the existing email service
+    email_service.send_email(
+        recipient_email=summary_recipient,
+        subject=subject,
+        body=body
+    )
+    print(f"Weekly summary report sent to {summary_recipient}.")
+
+
 async def main() -> None:
     """
     Starts the bot, the scheduler, and runs them until interrupted.
@@ -308,6 +360,8 @@ async def main() -> None:
         # Add jobs to the scheduler
         scheduler.add_job(send_follow_ups, 'interval', days=FOLLOW_UP_DAYS, args=[application])
         scheduler.add_job(check_for_replies_job, 'interval', minutes=5, args=[application])
+        scheduler.add_job(purge_old_records_job, 'interval', days=1, args=[application])
+        scheduler.add_job(send_weekly_summary_job, 'interval', weeks=1, args=[application])
         scheduler.start()
         print(f"Scheduled jobs started. Follow-ups will be sent every {FOLLOW_UP_DAYS} days.")
 
