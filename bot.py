@@ -126,7 +126,7 @@ async def handle_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         f"**Subject:** {subject_for_preview}\n\n"
         f"{email_draft_body}\n"
         "-------------------------------------\n\n"
-        "**To approve and send, reply with 'approve' or 'yes'.**\n"
+        f"**To approve and send email to {recipient_email}, reply with 'approve' or 'yes'.**\n"
         "**To cancel, reply with 'cancel' or 'no'.**"
     )
     await context.bot.send_message(chat_id=chat_id, text=response_message)
