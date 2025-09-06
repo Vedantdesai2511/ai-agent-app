@@ -15,7 +15,7 @@ gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 
 def parse_user_input_with_gemini(text):
     """
-    Uses Gemini to parse user input into structured JSON, including a flexible details dictionary.
+    Uses Gemini to parse user input, now prioritizing phone_number over email.
     """
     prompt = f"""
     You are an expert at parsing user requests into structured JSON. Analyze the user's text and extract the required information.
@@ -23,29 +23,28 @@ def parse_user_input_with_gemini(text):
 
     ---
     **Example 1 (Simple case):**
-    **User text:** "report name John Doe, email john.doe@example.com, target officials@texas.gov"
+    **User text:** "report name John Doe, phone 555-123-4567, target officials@texas.gov"
     **Your JSON output:**
     ```json
     {{
       "name": "John Doe",
-      "offender_email": "john.doe@example.com",
+      "offender_phone_number": "555-123-4567",
       "official_email": "officials@texas.gov",
       "offender_details": {{}}
     }}
     ```
 
     **Example 2 (Complex case with multiple details):**
-    **User text:** "please file report for john pape their email is john.pape@gmail.com, send it to vedantdesai07@gmail.com. His address is 123 Texas Rd, Houston, TX 77001 and phone is 832-555-1234. He sells veg catering to Indians nearby, it works by word of mouth."
+    **User text:** "please file report for john pape their phone is 832-555-1234, send it to vedantdesai07@gmail.com. His address is 123 Texas Rd, Houston, TX 77001. He sells veg catering."
     **Your JSON output:**
     ```json
     {{
       "name": "John Pape",
-      "offender_email": "john.pape@gmail.com",
+      "offender_phone_number": "832-555-1234",
       "official_email": "vedantdesai07@gmail.com",
       "offender_details": {{
         "Address": "123 Texas Rd, Houston, TX 77001",
-        "Phone Number": "832-555-1234",
-        "Notes": "He sells veg catering to Indians nearby, it works by word of mouth."
+        "Notes": "He sells veg catering."
       }}
     }}
     ```
@@ -55,7 +54,6 @@ def parse_user_input_with_gemini(text):
     **Your JSON output:**
     """
     try:
-        # ... (The Gemini call and JSON extraction logic remains the same) ...
         response = gemini_model.generate_content(prompt)
         response_text = response.text
         start_index = response_text.find('{')
@@ -71,9 +69,9 @@ def parse_user_input_with_gemini(text):
         return None
 
 
-def generate_email_with_gemini(name, offender_email, gist=None): # <-- Add gist parameter
+def generate_email_with_gemini(name, offender_phone_number, gist=None): # <-- Add gist parameter
     """Generates a formal email draft using Gemini."""
-    prompt = _build_email_prompt(name, offender_email, gist) # <-- Pass gist to helper
+    prompt = _build_email_prompt(name, offender_phone_number, gist) # <-- Pass gist to helper
     try:
         response = gemini_model.generate_content(prompt)
         return response.text
@@ -82,12 +80,13 @@ def generate_email_with_gemini(name, offender_email, gist=None): # <-- Add gist 
         return "Error: Could not generate email draft."
 
 
-def generate_follow_up_email(name, offender_email, offender_details=None):
+def generate_follow_up_email(name, offender_phone_number, offender_details=None):
     """
     Generates the BODY of a follow-up email.
     Returns a single string.
     """
-    prompt = _build_follow_up_prompt(name, offender_email, offender_details)
+    prompt = _build_follow_up_prompt(name, offender_phone_number, offender_details)
+
     try:
         response = gemini_model.generate_content(prompt)
         return response.text.strip()
@@ -99,34 +98,29 @@ def generate_follow_up_email(name, offender_email, offender_details=None):
 # --- Helper Functions ---
 
 
-def _build_email_prompt(name, offender_email, offender_details=None):
-    """A helper to create the email prompt, now with a dynamic details section."""
-
+def _build_email_prompt(name, offender_phone_number, offender_details=None):
+    """A helper to create the prompt for the email body, using phone_number."""
     details_section = ""
     if offender_details:
-        # Start the section with a clear header
         details_section += "\nAdditional user-provided details about the operation are as follows:\n"
-        # Loop through the dictionary and format each key-value pair
         for key, value in offender_details.items():
             details_section += f"- {key}: {value}\n"
 
     return f"""
-    Please generate a highly formal and professional email to be sent to a Texas government official. The purpose of this email is to report an illegitimate catering business.
+    Generate the body for a highly formal and professional email to a Texas government official to report an illegitimate catering business.
 
-    The key points to include are:
-    1. The business is being operated by a person named '{name}' (email: {offender_email}).
-    2. This business is not registered with the state and is therefore operating illegally.
-    3. This operation negatively impacts legitimate, tax-paying restaurant businesses in the area.
-    4. It creates significant hazards in a residential zone, including potential fire hazards and food safety hazards.
-    5. The state is losing tax revenue as this business is not paying taxes.
-    {details_section}
-    The tone should be serious, direct, and to the point. Make it clear that we are requesting an investigation. Start with a formal salutation like "Dear Texas Government Official," and end it with "Sincerely,".
-    Do not include a placeholder for the sender's name.
-    Do not include a subject line.
-    """
+    Key points for the body:
+    1. The business is operated by '{name}' (phone: {offender_phone_number}).
+    2. It is not registered with the state (operating illegally).
+    3. It negatively impacts legitimate, tax-paying businesses.
+    4. It creates fire and food safety hazards in a residential zone.
+    5. The state is losing tax revenue.
+    {details_section} The tone should be serious and direct. Start the body with a formal salutation like "Dear Texas 
+    Government Official," and end it with "Sincerely,". Do not include a subject line."""
 
-def _build_follow_up_prompt(name, offender_email, offender_details=None):
-    """A helper to create the prompt for the follow-up email body."""
+
+def _build_follow_up_prompt(name, offender_phone_number, offender_details=None):
+    """A helper to create the prompt for the follow-up email body, using phone_number."""
     details_section = ""
     if offender_details:
         details_section += "\nThe original report included these details:\n"
@@ -137,7 +131,7 @@ def _build_follow_up_prompt(name, offender_email, offender_details=None):
     Generate the body for a polite but firm follow-up email to a Texas government official about a previously reported illegitimate catering business.
 
     Key details of the original report:
-    - Business operated by: {name} ({offender_email})
+    - Business operated by: {name} (phone: {offender_phone_number})
     {details_section}
     The follow-up body should:
     1. Reference the previous email.
@@ -146,11 +140,11 @@ def _build_follow_up_prompt(name, offender_email, offender_details=None):
     4. Maintain a professional tone. Do not include a subject line.
     """
 
-# ... (The rest of the file, including the wrapper functions, can stay the same) ...
+
 # Update the wrapper function to accept the new argument
-def generate_email_draft(name, offender_email, offender_details=None):
+def generate_email_draft(name, offender_phone_number, offender_details=None):
     """Generates a formal email draft using Gemini, now with a details dictionary."""
-    prompt = _build_email_prompt(name, offender_email, offender_details)
+    prompt = _build_email_prompt(name, offender_phone_number, offender_details)
     try:
         response = gemini_model.generate_content(prompt)
         return response.text

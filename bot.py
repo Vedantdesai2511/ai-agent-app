@@ -19,6 +19,7 @@ load_dotenv()
 # --- CONFIGURATION CONSTANT ---
 # The single source of truth for the follow-up period in days.
 FOLLOW_UP_DAYS = 7
+DEFAULT_RECIPIENT_EMAIL = "vedantdesai07@gmail.com"
 STANDARD_SUBJECT_LINE = ("Urgent: Reporting Unlicensed and Illegal Food Catering Operations - Potential Public Safety Hazard - "
                          "Requesting Action to stop this catering operation: {name}")
 
@@ -72,7 +73,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def handle_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handles a new report request, now using the flexible details parser."""
+    """Handles a new report, requiring name and phone_number."""
     user_message = update.message.text
     chat_id = update.effective_chat.id
 
@@ -85,35 +86,45 @@ async def handle_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     parsed_data = llm_service.parse_user_input_with_gemini(user_message)
 
-    if not parsed_data or not all(key in parsed_data for key in ['name', 'offender_email', 'official_email']):
-        await context.bot.send_message(chat_id=chat_id,
-                                       text="Sorry, I couldn't extract all the required details. Please provide at "
-                                            "least the person's name, their email, and the official's email.")
+    # We check for name and email BEFORE generating the draft to save API calls.
+    if not parsed_data or not parsed_data.get('name') or not parsed_data.get('offender_phone_number'):
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Sorry, I couldn't create a report. Please make sure to include the offender's **name** and **phone "
+                 "number** of offender."
+        )
         return
+
+    await context.bot.send_message(chat_id=chat_id, text="Drafting the email...")
+
+    recipient_email = parsed_data.get('official_email')
+    if not recipient_email:
+        recipient_email = DEFAULT_RECIPIENT_EMAIL
+        print(f"No recipient email provided. Using default: {DEFAULT_RECIPIENT_EMAIL}")
 
     offender_details = parsed_data.get('offender_details')
 
-    email_draft = llm_service.generate_email_draft(
+    email_draft_body = llm_service.generate_email_draft(
         name=parsed_data['name'],
-        offender_email=parsed_data['offender_email'],
-        offender_details=offender_details  # <-- Pass the new details dictionary here
+        offender_phone_number=parsed_data['offender_phone_number'],
+        offender_details=offender_details
     )
 
+    # Pass all required details, including the now-guaranteed recipient_email
     report_id = database_service.create_report(
-        chat_id, parsed_data['name'], parsed_data['offender_email'], parsed_data['official_email'],
-        email_draft, offender_details
+        chat_id, parsed_data['name'], parsed_data['offender_phone_number'], recipient_email,
+        email_draft_body, offender_details
     )
 
     context.chat_data['pending_approval_id'] = report_id
 
     subject_for_preview = STANDARD_SUBJECT_LINE.format(name=parsed_data['name'])
-
     response_message = (
         f"**New Report Draft (ID: {report_id})**\n\n"
         "Here is the draft I've prepared based on your details. Please review it carefully.\n\n"
         "-------------------------------------\n"
         f"**Subject:** {subject_for_preview}\n\n"
-        f"{email_draft}\n"
+        f"{email_draft_body}\n"
         "-------------------------------------\n\n"
         "**To approve and send, reply with 'approve' or 'yes'.**\n"
         "**To cancel, reply with 'cancel' or 'no'.**"
@@ -201,7 +212,7 @@ async def send_follow_ups(context: ContextTypes.DEFAULT_TYPE):
 
         follow_up_draft = llm_service.generate_follow_up_email(
             report['name'],
-            report['offender_email'],
+            report['offender_phone_number'],
             report.get('offender_details')
         )
 

@@ -5,7 +5,7 @@ import time
 db = TinyDB('reports_db.json', indent=4)
 
 
-def create_report(chat_id, name, offender_email, official_email, draft, offender_details):
+def create_report(chat_id, name, offender_phone_number, official_email, draft, offender_details):
     """
     Saves a new report to the database. The subject is no longer stored.
     """
@@ -16,9 +16,9 @@ def create_report(chat_id, name, offender_email, official_email, draft, offender
         'chat_id': chat_id,
         'status': 'awaiting_approval',
         'name': name,
-        'offender_email': offender_email,
+        'offender_phone_number': offender_phone_number,
         'official_email': official_email,
-        'draft': draft,  # This field now holds the email body
+        'draft': draft,
         'offender_details': offender_details,
         'created_at': time.time(),
         'last_updated_at': time.time(),
